@@ -17,6 +17,7 @@
       <li>Palak is a communication aid, not a medical device.</li>
     </ul>
     <button id="start" class="primary">Turn on the camera and start</button>
+    <p id="consent-error"></p>
   </section>
 
   <section id="app" class="screen hidden">
@@ -26,7 +27,10 @@
       <button id="stop">Stop camera</button>
     </header>
     <main>
-      <div id="board"></div>
+      <div>
+        <div id="compose" class="hidden"></div>
+        <div id="board"></div>
+      </div>
       <aside>
         <video id="preview" autoplay muted playsinline></video>
         <p id="hint">Starting the camera…</p>
@@ -34,10 +38,16 @@
         <label>Scan speed <input id="speed" type="range" min="800" max="3000" step="100" value="1600"> <output id="speed-out">1.6 s</output></label>
         <label><input id="use-brows" type="checkbox"> Raised eyebrows also select</label>
         <label><input id="hindi" type="checkbox"> Speak in Hindi</label>
+        <button id="calibrate">Calibrate blinks (20 s)</button>
+        <p id="calib"></p>
         <ol id="history"></ol>
       </aside>
     </main>
   </section>
+  <div id="alarm" class="hidden" role="alertdialog" aria-label="Help needed">
+    <p>Help needed!<span>मदद चाहिए!</span></p>
+    <button id="alarm-stop" class="primary">I'm here</button>
+  </div>
   <script src="dist/renderer.bundle.js"></script>
 </body>
 </html>

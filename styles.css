@@ -22,14 +22,22 @@ header h1 { margin: 0; font-size: 28px; }
 #said { flex: 1; font-size: 32px; font-weight: 600; color: var(--hit); min-height: 44px; }
 main { display: grid; grid-template-columns: 1fr 320px; gap: 24px; padding: 24px; }
 #board { display: grid; gap: 14px; align-content: start; }
-.row { display: grid; grid-template-columns: 140px repeat(4, 1fr) 110px; gap: 10px; padding: 8px; border-radius: 14px; border: 3px solid transparent; }
+.row { display: flex; gap: 10px; padding: 8px; border-radius: 14px; border: 3px solid transparent; }
+.row .cell { flex: 1 1 0; }
+.row .cell.back { flex: 0 0 100px; }
 .row.lit { border-color: var(--hit); background: var(--row); }
-.row .name { align-self: center; color: var(--muted); font-size: 16px; }
+.row .name { flex: 0 0 120px; align-self: center; color: var(--muted); font-size: 16px; }
 .cell { padding: 22px 12px; border-radius: 12px; background: var(--panel); text-align: center; font-size: 22px; font-weight: 600; }
 .cell small { display: block; font-size: 15px; font-weight: 400; color: var(--muted); }
 .cell.lit { background: var(--hit); color: #1a1400; transform: scale(1.04); }
 .cell.lit small { color: #4a3d00; }
 .cell.back { font-size: 18px; color: var(--muted); }
+.cell.action { border: 2px dashed #4a5370; }
+#compose { margin-bottom: 14px; padding: 16px 20px; border-radius: 12px; background: var(--panel); font-size: 34px; letter-spacing: 2px; min-height: 66px; }
+#consent-error, #calib { color: var(--hit); }
+#alarm { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(160, 20, 20, 0.92); }
+#alarm p { font-size: 64px; font-weight: 700; margin: 0; text-align: center; }
+#alarm p span { display: block; font-size: 40px; }
 aside { display: flex; flex-direction: column; gap: 12px; }
 #preview { width: 100%; border-radius: 12px; background: #000; transform: scaleX(-1); }
 #hint { margin: 0; color: var(--hit); }
