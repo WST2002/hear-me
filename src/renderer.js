@@ -39,6 +39,9 @@ let quietUntil = 0;
 let lastFaceAt = 0;
 let eyesClosed = false;
 let lastHint = "";
+// Live readings for the eye meter (and for reading the app state while testing).
+const live = { openness: 0, openLevel: 0, closed: false, faceFrames: 0, selects: 0 };
+window.palakLive = live;
 let alarm = null;
 let calibration = null; // { phase, until, frames: { natural: [], deliberate: [] } }
 
@@ -111,6 +114,7 @@ function stopAlarm() {
 }
 
 function onSelect(now) {
+  live.selects++;
   if (burst.press(now)) {
     startAlarm();
     return;
@@ -161,9 +165,15 @@ function onMetrics(buf) {
   for (const l of face.landmarks ?? []) {
     const t = toMs(l.timestamp);
     const points = l.value ?? [];
-    if (points.length >= 468) lastFaceAt = performance.now();
-    const closed = closure.update(points.length >= 468 ? eyeOpenness(eyePoints(points)) : null);
+    const value = points.length >= 468 ? eyeOpenness(eyePoints(points)) : null;
+    if (value !== null) {
+      lastFaceAt = performance.now();
+      live.openness = value;
+      live.faceFrames++;
+    }
+    const closed = closure.update(value);
     eyesClosed = closed;
+    live.closed = closed;
     if (calibration) { calibrationFrame(t, closed); continue; }
     if (longBlink.update(t, closed) && gateOpen) onSelect(performance.now());
   }
@@ -182,6 +192,9 @@ function scanLoop() {
   const seeing = now - lastFaceAt < 1000 || eyesClosed;
   $("paused").classList.toggle("hidden", !sdk || seeing);
   $("paused").textContent = `Paused: ${lastHint || "looking for a face"}`;
+  $("meter-fill").style.width = `${Math.min(100, (live.openness / 0.45) * 100)}%`;
+  $("meter").classList.toggle("closed", seeing && eyesClosed);
+  $("meter-text").textContent = !seeing ? "Eyes: no face data" : eyesClosed ? "Eyes: closed" : "Eyes: open";
   if (sdk && seeing && gateOpen && !calibration && !alarm && !eyesClosed && now - lastTick >= settings.speed) {
     scanner.tick();
     lastTick = now;
@@ -225,9 +238,29 @@ async function start() {
     $("hint").textContent = lastHint || "Camera ready";
   });
   sdk.on("metrics", onMetrics);
-  sdk.on("error", (code, message) => { $("hint").textContent = `Camera error ${code}: ${message}`; });
+  sdk.on("error", (code, message) => {
+    $("hint").textContent = `Camera error ${code}: ${message}`;
+    recover();
+  });
   await sdk.start();
   lastTick = performance.now();
+}
+
+// The SDK stops for good after an error (for example when a busy laptop drops below 25 fps).
+// Rebuild it and carry on, so the person is never left with a board that silently stopped listening.
+let recovering = false;
+async function recover() {
+  if (recovering || !sdk) return;
+  recovering = true;
+  lastHint = "restarting the camera";
+  await new Promise((r) => setTimeout(r, 1500));
+  try {
+    await sdk.reset();
+    await sdk.start();
+  } catch (e) {
+    $("hint").textContent = `Restart failed: ${e.message}`;
+  }
+  recovering = false;
 }
 
 async function stop() {

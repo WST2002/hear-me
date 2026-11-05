@@ -42,6 +42,10 @@ main { display: grid; grid-template-columns: 1fr 320px; gap: 24px; padding: 24px
 aside { display: flex; flex-direction: column; gap: 12px; }
 #preview { width: 100%; border-radius: 12px; background: #000; transform: scaleX(-1); }
 #hint { margin: 0; color: var(--hit); }
+#meter { height: 14px; border-radius: 7px; background: #2b303c; overflow: hidden; }
+#meter-fill { height: 100%; width: 0; background: var(--ok); }
+#meter.closed #meter-fill { background: #ff5a5a; }
+#meter-text { margin: 0; font-size: 18px; font-weight: 600; }
 #state { margin: 0; color: var(--muted); font-size: 15px; }
 label { color: var(--muted); font-size: 15px; }
 #history { margin: 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
