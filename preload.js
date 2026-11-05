@@ -2,4 +2,7 @@
 require("@smartspectra/node-sdk/preload");
 const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("palak", { apiKey: () => ipcRenderer.invoke("palak:api-key") });
+contextBridge.exposeInMainWorld("palak", {
+  apiKey: () => ipcRenderer.invoke("palak:api-key"),
+  replay: () => ipcRenderer.invoke("palak:replay"),
+});

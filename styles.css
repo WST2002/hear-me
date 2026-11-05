@@ -35,6 +35,7 @@ main { display: grid; grid-template-columns: 1fr 320px; gap: 24px; padding: 24px
 .cell.action { border: 2px dashed #4a5370; }
 #compose { margin-bottom: 14px; padding: 16px 20px; border-radius: 12px; background: var(--panel); font-size: 34px; letter-spacing: 2px; min-height: 66px; }
 #consent-error, #calib { color: var(--hit); }
+#paused { margin-bottom: 14px; padding: 14px 20px; border-radius: 12px; background: #5a1d1d; color: #ffd6d6; font-size: 26px; font-weight: 600; }
 #alarm { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(160, 20, 20, 0.92); }
 #alarm p { font-size: 64px; font-weight: 700; margin: 0; text-align: center; }
 #alarm p span { display: block; font-size: 40px; }

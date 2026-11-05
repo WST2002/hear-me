@@ -8,7 +8,7 @@ const apiKey = env.SMARTSPECTRA_API_KEY;
 if (!apiKey || apiKey.startsWith("PASTE_")) throw new Error("API key missing: paste it into .env as SMARTSPECTRA_API_KEY=...");
 
 const seconds = Number(process.argv[2] ?? 40);
-const sdk = new SmartSpectraSDK({ apiKey, requestedMetrics: [...faceMetrics, ...breathingMetrics], enableTelemetry: false });
+const sdk = new SmartSpectraSDK({ apiKey, requestedMetrics: process.argv.includes("--breathing") ? [...faceMetrics, ...breathingMetrics] : [...faceMetrics], enableTelemetry: false });
 let first = true;
 sdk.on("processingStatus", (s) => console.log("status:", s));
 sdk.on("validationStatus", (code, _ts, hint) => console.log("validation:", code, hint ?? ""));

@@ -6,6 +6,7 @@ const { createScanner } = require("./core/scanner");
 const { createComposer } = require("./core/composer");
 const { createBurst } = require("./core/alarm");
 const { blinkDurations, longBlinkThreshold } = require("./core/calibrate");
+const { eyeOpenness, eyePoints, createEyeClosure } = require("./core/eyes");
 const { phrases, letters } = require("./phrases");
 
 const SURPRISE = 8; // presage.smartspectra.ExpressionType.SURPRISE
@@ -19,7 +20,10 @@ const saveSettings = () => { try { localStorage.setItem("palak.settings", JSON.s
 const boards = { phrases, letters };
 let boardName = "phrases";
 let scanner = createScanner(phrases.map((r) => r.items));
-let longBlink = createLongBlink({ minClosedMs: settings.blinkMs });
+// Eyes shut for up to 5 s select; longer is resting.
+const MAX_CLOSED_MS = 5000;
+let longBlink = createLongBlink({ minClosedMs: settings.blinkMs, maxClosedMs: MAX_CLOSED_MS });
+const closure = createEyeClosure();
 const brows = createExpressionHold({ holdMs: 400 });
 const gate = createTalkGate();
 // Panic shortcut: four long blinks inside 3 s. Normal use cannot reach that, because of the pause after each phrase.
@@ -31,6 +35,10 @@ let stream = null;
 let gateOpen = true;
 let lastTick = 0;
 let quietUntil = 0;
+// The SDK sends no face data while the face is badly placed; the board waits instead of scanning blind.
+let lastFaceAt = 0;
+let eyesClosed = false;
+let lastHint = "";
 let alarm = null;
 let calibration = null; // { phase, until, frames: { natural: [], deliberate: [] } }
 
@@ -140,7 +148,7 @@ function calibrationFrame(t, closed) {
   const natural = blinkDurations(calibration.frames.natural);
   const deliberate = blinkDurations(calibration.frames.deliberate).filter((d) => d > 300);
   settings.blinkMs = longBlinkThreshold(natural, deliberate);
-  longBlink = createLongBlink({ minClosedMs: settings.blinkMs });
+  longBlink = createLongBlink({ minClosedMs: settings.blinkMs, maxClosedMs: MAX_CLOSED_MS });
   saveSettings();
   $("calib").textContent = `Done: a blink longer than ${settings.blinkMs} ms now selects (${deliberate.length} long blinks seen)`;
   calibration = null;
@@ -150,9 +158,12 @@ function onMetrics(buf) {
   const face = decodeMetrics(buf).face;
   if (!face) return;
   for (const s of face.talking ?? []) gateOpen = gate.update(toMs(s.timestamp), Boolean(s.detected));
-  for (const s of face.blinking ?? []) {
-    const t = toMs(s.timestamp);
-    const closed = Boolean(s.detected);
+  for (const l of face.landmarks ?? []) {
+    const t = toMs(l.timestamp);
+    const points = l.value ?? [];
+    if (points.length >= 468) lastFaceAt = performance.now();
+    const closed = closure.update(points.length >= 468 ? eyeOpenness(eyePoints(points)) : null);
+    eyesClosed = closed;
     if (calibration) { calibrationFrame(t, closed); continue; }
     if (longBlink.update(t, closed) && gateOpen) onSelect(performance.now());
   }
@@ -167,7 +178,11 @@ function onMetrics(buf) {
 
 function scanLoop() {
   const now = performance.now();
-  if (sdk && gateOpen && !calibration && !alarm && now - lastTick >= settings.speed) {
+  // Hold the highlight still while the eyes are shut, so the choice is the one they closed their eyes on.
+  const seeing = now - lastFaceAt < 1000 || eyesClosed;
+  $("paused").classList.toggle("hidden", !sdk || seeing);
+  $("paused").textContent = `Paused: ${lastHint || "looking for a face"}`;
+  if (sdk && seeing && gateOpen && !calibration && !alarm && !eyesClosed && now - lastTick >= settings.speed) {
     scanner.tick();
     lastTick = now;
     drawBoard();
@@ -178,6 +193,14 @@ function scanLoop() {
 // Laptops often list a virtual camera first (vendor effects apps); prefer a real one, which keeps 30 fps.
 // 640x360 keeps the frame pump above the 25 fps the SDK needs on a laptop CPU.
 async function openCamera() {
+  const replay = await window.palak.replay();
+  if (replay) {
+    const clip = document.createElement("video");
+    clip.src = replay;
+    clip.muted = true;
+    await clip.play();
+    return clip.captureStream(30);
+  }
   const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
   const real = cams.find((d) => !/virtual/i.test(d.label)) ?? cams[0];
   return navigator.mediaDevices.getUserMedia({
@@ -197,7 +220,10 @@ async function start() {
   stream = await openCamera();
   $("preview").srcObject = stream;
   sdk.useMediaStream(stream);
-  sdk.on("validationStatus", (code, _ts, hint) => { $("hint").textContent = code === 0 ? "Camera ready" : hint || "Adjust position"; });
+  sdk.on("validationStatus", (code, _ts, hint) => {
+    lastHint = code === 0 ? "" : hint || "Adjust position";
+    $("hint").textContent = lastHint || "Camera ready";
+  });
   sdk.on("metrics", onMetrics);
   sdk.on("error", (code, message) => { $("hint").textContent = `Camera error ${code}: ${message}`; });
   await sdk.start();

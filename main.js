@@ -2,6 +2,7 @@
 // and the API key read from .env (never bundled into the renderer).
 const fs = require("fs");
 const path = require("path");
+const { pathToFileURL } = require("url");
 const { app, BrowserWindow, ipcMain, session } = require("electron");
 const { bindSmartSpectraIpc } = require("@smartspectra/node-sdk/main");
 
@@ -34,6 +35,9 @@ app.whenReady().then(() => {
     callback(permission === "media" && types.length === 1 && types[0] === "video" && url.startsWith("file://"));
   });
   ipcMain.handle("palak:api-key", () => readApiKey());
+  // `npm start -- --replay=clip.mp4` feeds a recorded clip instead of the camera (testing and demos).
+  const replay = process.argv.find((a) => a.startsWith("--replay="))?.slice(9);
+  ipcMain.handle("palak:replay", () => (replay ? pathToFileURL(path.resolve(replay)).href : null));
   createWindow();
 });
 
