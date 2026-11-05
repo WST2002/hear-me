@@ -30,3 +30,10 @@ test("Clear empties the line, Delete on empty is harmless", () => {
 test("Phrases asks to switch back to the phrase board", () => {
   assert.deepEqual(createComposer().apply("Phrases"), { board: "phrases" });
 });
+
+test("a suggested word (+WORD) completes the word being typed", () => {
+  const c = createComposer();
+  for (const k of ["I", "Space", "W", "A"]) c.apply(k);
+  c.apply("+WATER");
+  assert.equal(c.text(), "I WATER ");
+});

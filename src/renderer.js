@@ -8,18 +8,28 @@ const { createBurst } = require("./core/alarm");
 const { blinkDurations, longBlinkThreshold } = require("./core/calibrate");
 const { eyeOpenness, eyePoints, createEyeClosure } = require("./core/eyes");
 const { phrases, letters } = require("./phrases");
+const { suggest } = require("./core/predict");
 
 const SURPRISE = 8; // presage.smartspectra.ExpressionType.SURPRISE
 const $ = (id) => document.getElementById(id);
 
 // Settings stay on this computer only (localStorage); nothing about the person is stored.
-const settings = { speed: 1600, brows: false, hindi: false, blinkMs: 500 };
+const settings = { speed: 1600, brows: false, hindi: false, blinkMs: 500, mine: "" };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("palak.settings") || "{}")); } catch {}
 const saveSettings = () => { try { localStorage.setItem("palak.settings", JSON.stringify(settings)); } catch {} };
 
-const boards = { phrases, letters };
+// The phrase board gets a "Mine" row with the caregiver's own phrases; the letter board a "Words" row of suggestions.
+function buildBoard(name) {
+  if (name === "letters") {
+    const words = suggest(composer.text());
+    return words.length ? [{ row: "Words", items: words.map((w) => ({ key: `+${w}`, label: w })) }, ...letters] : letters;
+  }
+  const mine = settings.mine.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 5).map((l) => ({ en: l, hi: l }));
+  return mine.length ? [phrases[0], { row: "Mine", items: mine }, ...phrases.slice(1)] : phrases;
+}
 let boardName = "phrases";
-let scanner = createScanner(phrases.map((r) => r.items));
+let board = null;
+let scanner = null;
 // Eyes shut for up to 5 s select; longer is resting.
 const MAX_CLOSED_MS = 5000;
 let longBlink = createLongBlink({ minClosedMs: settings.blinkMs, maxClosedMs: MAX_CLOSED_MS });
@@ -48,14 +58,14 @@ let calibration = null; // { phase, until, frames: { natural: [], deliberate: []
 const toMs = (ts) => (typeof ts?.toNumber === "function" ? ts.toNumber() : Number(ts)) / 1000;
 
 function cellHtml(c, lit) {
-  const label = c.key ?? c.en;
+  const label = c.label ?? c.key ?? c.en;
   const sub = c.hi ? `<small>${c.hi}</small>` : "";
   return `<div class="cell${lit ? " lit" : ""}${c.action ? " action" : ""}">${label}${sub}</div>`;
 }
 
 function drawBoard() {
   const { mode, row, cell } = scanner.state();
-  $("board").innerHTML = boards[boardName]
+  $("board").innerHTML = board
     .map((r, i) => {
       const rowLit = i === row;
       const cells = r.items.map((c, j) => cellHtml(c, rowLit && mode === "cells" && cell === j)).join("");
@@ -69,7 +79,8 @@ function drawBoard() {
 
 function switchBoard(name) {
   boardName = name;
-  scanner = createScanner(boards[name].map((r) => r.items));
+  board = buildBoard(name);
+  scanner = createScanner(board.map((r) => r.items));
 }
 
 function say(text, lang) {
@@ -127,7 +138,7 @@ function onSelect(now) {
   else if (value?.key) {
     const r = composer.apply(value.key);
     if (r.say) { say(r.say, "en-IN"); $("said").textContent = r.say; }
-    if (r.board) switchBoard(r.board);
+    switchBoard(r.board ?? "letters");
   } else if (value) speakPhrase(value);
   if (value) quietUntil = now + AFTER_PHRASE_MS;
   drawBoard();
@@ -287,6 +298,13 @@ function bindSettings() {
   });
   $("use-brows").addEventListener("change", () => { settings.brows = $("use-brows").checked; saveSettings(); });
   $("hindi").addEventListener("change", () => { settings.hindi = $("hindi").checked; saveSettings(); });
+  $("mine").value = settings.mine;
+  $("mine").addEventListener("change", () => {
+    settings.mine = $("mine").value;
+    saveSettings();
+    if (boardName === "phrases") switchBoard("phrases");
+    drawBoard();
+  });
 }
 
 $("start").addEventListener("click", start);
@@ -300,5 +318,6 @@ document.addEventListener("keydown", (e) => {
   onSelect(performance.now());
 });
 bindSettings();
+switchBoard("phrases");
 drawBoard();
 requestAnimationFrame(scanLoop);
