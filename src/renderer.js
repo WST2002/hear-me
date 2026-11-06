@@ -203,6 +203,8 @@ function scanLoop() {
   const seeing = now - lastFaceAt < 1000 || eyesClosed;
   $("paused").classList.toggle("hidden", !sdk || seeing);
   $("paused").textContent = `Paused: ${lastHint || "looking for a face"}`;
+  // Setup hints matter only while there is no face data; once the eyes are tracked, say so.
+  if (sdk && !recovering) $("hint").textContent = seeing ? "Camera ready" : lastHint || "Looking for a face…";
   $("meter-fill").style.width = `${Math.min(100, (live.openness / 0.45) * 100)}%`;
   $("meter").classList.toggle("closed", seeing && eyesClosed);
   $("meter-text").textContent = !seeing ? "Eyes: no face data" : eyesClosed ? "Eyes: closed" : "Eyes: open";
@@ -245,7 +247,6 @@ async function start() {
   sdk.useMediaStream(stream);
   sdk.on("validationStatus", (code, _ts, hint) => {
     lastHint = code === 0 ? "" : hint || "Adjust position";
-    $("hint").textContent = lastHint || "Camera ready";
   });
   sdk.on("metrics", onMetrics);
   sdk.on("error", (code, message) => {
