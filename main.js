@@ -19,7 +19,9 @@ function createWindow() {
     height: 820,
     backgroundColor: "#0f1115",
     title: "Palak",
-    webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: false, nodeIntegration: false },
+    // --background: never shown (automated test runs); keep the scan timer and camera running anyway.
+    show: !process.argv.includes("--background"),
+    webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: false, nodeIntegration: false, backgroundThrottling: false },
   });
   bindSmartSpectraIpc(win);
   win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));

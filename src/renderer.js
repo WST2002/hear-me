@@ -211,7 +211,6 @@ function scanLoop() {
     lastTick = now;
     drawBoard();
   }
-  requestAnimationFrame(scanLoop);
 }
 
 // Laptops often list a virtual camera first (vendor effects apps); prefer a real one, which keeps 30 fps.
@@ -320,4 +319,4 @@ document.addEventListener("keydown", (e) => {
 bindSettings();
 switchBoard("phrases");
 drawBoard();
-requestAnimationFrame(scanLoop);
+setInterval(scanLoop, 50);
