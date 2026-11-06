@@ -40,7 +40,7 @@ The camera stream runs at 640x360 and 30 fps, which keeps the SDK's frame rate o
 - The camera turns on only after the caregiver or user presses **Turn on the camera and start**, and turns off with **Stop camera**.
 - Video is processed on this computer. Palak does not record, upload or save any video, image or measurement.
 - SDK telemetry is turned off (`enableTelemetry: false`). The SDK still checks the API key with Presage's server.
-- The only thing saved is the settings (scan speed, language, blink threshold), kept in the app's local storage on this computer.
+- The only thing saved is the settings (scan speed, language, blink threshold, the caregiver's own phrases), kept in the app's local storage on this computer.
 - Palak is a communication aid. It does not diagnose, treat or monitor any condition.
 
 ## Setup
