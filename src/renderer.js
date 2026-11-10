@@ -238,6 +238,7 @@ async function openCamera() {
     clip.src = replay;
     clip.muted = true;
     await clip.play();
+    window.hearMeReplay = clip; // lets a test script play the recording like a person would
     return clip.captureStream(30);
   }
   const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
@@ -278,12 +279,22 @@ async function recover() {
   if (recovering || !sdk) return;
   recovering = true;
   lastHint = "restarting the camera";
-  await new Promise((r) => setTimeout(r, 1500));
-  try {
-    await sdk.reset();
-    await sdk.start();
-  } catch (e) {
-    $("hint").textContent = `Restart failed: ${e.message}`;
+  // Keep trying until it works or the caregiver stops the camera. A reset can end the camera stream, so reopen it.
+  for (let attempt = 1; sdk; attempt++) {
+    await new Promise((r) => setTimeout(r, 1500));
+    if (!sdk) break;
+    try {
+      await sdk.reset();
+      if (!stream?.getVideoTracks().some((t) => t.readyState === "live")) {
+        stream = await openCamera();
+        $("preview").srcObject = stream;
+        sdk.useMediaStream(stream);
+      }
+      await sdk.start();
+      break;
+    } catch (e) {
+      $("hint").textContent = `Restart failed (try ${attempt}): ${e.message}. Trying again…`;
+    }
   }
   recovering = false;
 }
