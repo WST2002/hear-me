@@ -14,7 +14,7 @@ const SURPRISE = 8; // presage.smartspectra.ExpressionType.SURPRISE
 const $ = (id) => document.getElementById(id);
 
 // Settings stay on this computer only (localStorage); nothing about the person is stored.
-const settings = { speed: 1600, brows: false, hindi: false, blinkMs: 500, mine: "" };
+const settings = { speed: 1600, brows: false, hindi: false, blinkMs: 500, mine: "", hideFace: false };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("hearme.settings") || "{}")); } catch {}
 const saveSettings = () => { try { localStorage.setItem("hearme.settings", JSON.stringify(settings)); } catch {} };
 
@@ -197,6 +197,17 @@ function onMetrics(buf) {
   $("state").textContent = calibration ? "Calibrating" : gateOpen ? "Scanning" : "Paused while talking";
 }
 
+// Privacy view: instead of the camera picture, two drawn eyes that open and close with the measured eye openness.
+let shownOpen = 1;
+function drawEyes(seeing) {
+  $("preview").classList.toggle("hidden", settings.hideFace);
+  $("eye-view").classList.toggle("hidden", !settings.hideFace);
+  if (!settings.hideFace) return;
+  const target = !seeing ? 0.5 : eyesClosed ? 0.04 : Math.min(1, live.openness / 0.33);
+  shownOpen += (target - shownOpen) * 0.5;
+  for (const lid of document.querySelectorAll("#eye-view .lid, #eye-view .lid-line")) lid.setAttribute("ry", String(Math.max(1, 40 * shownOpen)));
+}
+
 function scanLoop() {
   const now = performance.now();
   // Hold the highlight still while the eyes are shut, so the choice is the one they closed their eyes on.
@@ -207,6 +218,7 @@ function scanLoop() {
   $("paused").textContent = `Paused: ${lastHint || "looking for a face"}`;
   // Setup hints matter only while there is no face data; once the eyes are tracked, say so.
   if (sdk && !recovering) $("hint").textContent = seeing ? "Camera ready" : lastHint || "Looking for a face…";
+  drawEyes(seeing);
   $("meter-fill").style.width = `${Math.min(100, (live.openness / 0.45) * 100)}%`;
   $("meter").classList.toggle("closed", seeing && eyesClosed);
   $("meter-text").textContent = !seeing ? "Eyes: no face data" : eyesClosed ? "Eyes: closed" : "Eyes: open";
@@ -300,6 +312,8 @@ function bindSettings() {
   });
   $("use-brows").addEventListener("change", () => { settings.brows = $("use-brows").checked; saveSettings(); });
   $("hindi").addEventListener("change", () => { settings.hindi = $("hindi").checked; saveSettings(); });
+  $("hide-face").checked = settings.hideFace;
+  $("hide-face").addEventListener("change", () => { settings.hideFace = $("hide-face").checked; saveSettings(); });
   $("mine").value = settings.mine;
   $("mine").addEventListener("change", () => {
     settings.mine = $("mine").value;

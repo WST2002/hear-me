@@ -41,6 +41,7 @@ main { display: grid; grid-template-columns: 1fr 300px; gap: 20px; padding: 16px
 #alarm p span { display: block; font-size: 40px; }
 aside { display: flex; flex-direction: column; gap: 12px; }
 #preview { width: 100%; border-radius: 12px; background: #000; transform: scaleX(-1); }
+#eye-view { width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; background: #1b1f29; padding: 0 8px; box-sizing: border-box; }
 #hint { margin: 0; color: var(--hit); }
 #meter { height: 14px; border-radius: 7px; background: #2b303c; overflow: hidden; }
 #meter-fill { height: 100%; width: 0; background: var(--ok); }

@@ -34,6 +34,11 @@
       </div>
       <aside>
         <video id="preview" autoplay muted playsinline></video>
+        <svg id="eye-view" class="hidden" viewBox="0 0 340 110" role="img" aria-label="Eyes as the camera sees them">
+          <defs><clipPath id="lid-l"><ellipse class="lid" cx="85" cy="55" rx="70" ry="40"/></clipPath><clipPath id="lid-r"><ellipse class="lid" cx="255" cy="55" rx="70" ry="40"/></clipPath></defs>
+          <g clip-path="url(#lid-l)"><ellipse cx="85" cy="55" rx="70" ry="40" fill="#f4f1ea"/><circle cx="85" cy="55" r="22" fill="#4a6fa5"/><circle cx="85" cy="55" r="10" fill="#111"/></g><ellipse class="lid-line" cx="85" cy="55" rx="70" ry="40" fill="none" stroke="#e9e3d6" stroke-width="4"/>
+          <g clip-path="url(#lid-r)"><ellipse cx="255" cy="55" rx="70" ry="40" fill="#f4f1ea"/><circle cx="255" cy="55" r="22" fill="#4a6fa5"/><circle cx="255" cy="55" r="10" fill="#111"/></g><ellipse class="lid-line" cx="255" cy="55" rx="70" ry="40" fill="none" stroke="#e9e3d6" stroke-width="4"/>
+        </svg>
         <p id="hint">Starting the camera…</p>
         <div id="meter"><div id="meter-fill"></div></div>
         <p id="meter-text">Eyes: no face data</p>
@@ -41,6 +46,7 @@
         <label>Scan speed <input id="speed" type="range" min="800" max="3000" step="100" value="1600"> <output id="speed-out">1.6 s</output></label>
         <label><input id="use-brows" type="checkbox"> Raised eyebrows also select</label>
         <label><input id="hindi" type="checkbox"> Speak in Hindi</label>
+        <label><input id="hide-face" type="checkbox"> Hide the camera picture (show the eyes as a drawing)</label>
         <label for="mine">Your own phrases, one per line (up to 5)</label>
         <textarea id="mine" rows="4" placeholder="Call Mummy&#10;Switch on the fan"></textarea>
         <button id="calibrate">Calibrate blinks (20 s)</button>
