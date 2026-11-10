@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; media-src 'self' blob: mediastream: file:">
-  <title>Palak</title>
+  <title>Hear Me</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <section id="consent" class="screen">
-    <h1>Palak <span>a blink becomes a voice</span></h1>
-    <p>Palak lets someone who cannot speak or move choose a phrase with a long blink, and reads it aloud.</p>
+    <h1>Hear Me <span>a blink becomes a voice</span></h1>
+    <p>Hear Me lets someone who cannot speak or move choose a phrase with a long blink, and reads it aloud.</p>
     <ul>
       <li>The camera is used only while a session is running. You can stop it at any time.</li>
-      <li>Video is processed on this computer. Palak records nothing and saves nothing.</li>
+      <li>Video is processed on this computer. Hear Me records nothing and saves nothing.</li>
       <li>SDK telemetry is turned off. The Presage SDK checks the API key online.</li>
-      <li>Palak is a communication aid, not a medical device.</li>
+      <li>Hear Me is a communication aid, not a medical device.</li>
     </ul>
     <button id="start" class="primary">Turn on the camera and start</button>
     <p id="consent-error"></p>
@@ -22,7 +22,7 @@
 
   <section id="app" class="screen hidden">
     <header>
-      <h1>Palak</h1>
+      <h1>Hear Me</h1>
       <div id="said" aria-live="assertive">Hold a long blink to choose</div>
       <button id="stop">Stop camera</button>
     </header>

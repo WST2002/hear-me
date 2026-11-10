@@ -1,4 +1,4 @@
-// Palak main process: one window, the SmartSpectra IPC bridge, camera-only permission for our own page,
+// Hear Me main process: one window, the SmartSpectra IPC bridge, camera-only permission for our own page,
 // and the API key read from .env (never bundled into the renderer).
 const fs = require("fs");
 const path = require("path");
@@ -18,7 +18,7 @@ function createWindow() {
     width: 1280,
     height: 820,
     backgroundColor: "#0f1115",
-    title: "Palak",
+    title: "Hear Me",
     // --background: never shown (automated test runs); keep the scan timer and camera running anyway.
     show: !process.argv.includes("--background"),
     webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: false, nodeIntegration: false, backgroundThrottling: false },
@@ -36,10 +36,10 @@ app.whenReady().then(() => {
     const types = details?.mediaTypes || [];
     callback(permission === "media" && types.length === 1 && types[0] === "video" && url.startsWith("file://"));
   });
-  ipcMain.handle("palak:api-key", () => readApiKey());
+  ipcMain.handle("hearme:api-key", () => readApiKey());
   // `npm start -- --replay=clip.mp4` feeds a recorded clip instead of the camera (testing and demos).
   const replay = process.argv.find((a) => a.startsWith("--replay="))?.slice(9);
-  ipcMain.handle("palak:replay", () => (replay ? pathToFileURL(path.resolve(replay)).href : null));
+  ipcMain.handle("hearme:replay", () => (replay ? pathToFileURL(path.resolve(replay)).href : null));
   createWindow();
 });
 

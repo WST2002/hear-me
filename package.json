@@ -1,7 +1,7 @@
 {
-  "name": "palak",
+  "name": "hear-me",
   "version": "0.1.0",
-  "description": "Palak: a blink becomes a voice. Webcam-only communication aid built on the Presage SmartSpectra SDK.",
+  "description": "Hear Me: a blink becomes a voice. Webcam-only communication aid built on the Presage SmartSpectra SDK.",
   "main": "main.js",
   "scripts": {
     "test": "node --test test/*.test.js",

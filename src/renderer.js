@@ -1,4 +1,4 @@
-// Palak renderer: camera signals from SmartSpectra -> select switches -> row-column scanner -> spoken words.
+// Hear Me renderer: camera signals from SmartSpectra -> select switches -> row-column scanner -> spoken words.
 const { SmartSpectraSDK, faceMetrics } = require("@smartspectra/node-sdk/renderer");
 const { decodeMetrics } = require("@smartspectra/node-sdk/messages");
 const { createLongBlink, createExpressionHold, createTalkGate } = require("./core/switches");
@@ -15,8 +15,8 @@ const $ = (id) => document.getElementById(id);
 
 // Settings stay on this computer only (localStorage); nothing about the person is stored.
 const settings = { speed: 1600, brows: false, hindi: false, blinkMs: 500, mine: "" };
-try { Object.assign(settings, JSON.parse(localStorage.getItem("palak.settings") || "{}")); } catch {}
-const saveSettings = () => { try { localStorage.setItem("palak.settings", JSON.stringify(settings)); } catch {} };
+try { Object.assign(settings, JSON.parse(localStorage.getItem("hearme.settings") || "{}")); } catch {}
+const saveSettings = () => { try { localStorage.setItem("hearme.settings", JSON.stringify(settings)); } catch {} };
 
 // The phrase board gets a "Mine" row with the caregiver's own phrases; the letter board a "Words" row of suggestions.
 function buildBoard(name) {
@@ -51,7 +51,7 @@ let eyesClosed = false;
 let lastHint = "";
 // Live readings for the eye meter (and for reading the app state while testing).
 const live = { openness: 0, openLevel: 0, closed: false, faceFrames: 0, selects: 0 };
-window.palakLive = live;
+window.hearMeLive = live;
 let alarm = null;
 let calibration = null; // { phase, until, frames: { natural: [], deliberate: [] } }
 
@@ -218,7 +218,7 @@ function scanLoop() {
 // Laptops often list a virtual camera first (vendor effects apps); prefer a real one, which keeps 30 fps.
 // 640x360 keeps the frame pump above the 25 fps the SDK needs on a laptop CPU.
 async function openCamera() {
-  const replay = await window.palak.replay();
+  const replay = await window.hearMe.replay();
   if (replay) {
     const clip = document.createElement("video");
     clip.src = replay;
@@ -234,7 +234,7 @@ async function openCamera() {
 }
 
 async function start() {
-  const apiKey = await window.palak.apiKey();
+  const apiKey = await window.hearMe.apiKey();
   if (!apiKey) {
     $("consent-error").textContent = "API key missing: add SMARTSPECTRA_API_KEY to the .env file.";
     return;
