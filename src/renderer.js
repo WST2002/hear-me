@@ -200,7 +200,9 @@ function onMetrics(buf) {
 function scanLoop() {
   const now = performance.now();
   // Hold the highlight still while the eyes are shut, so the choice is the one they closed their eyes on.
-  const seeing = now - lastFaceAt < 1000 || eyesClosed;
+  // The tracker sends no landmarks while the eyes are shut, but past the longest blink that counts, the face is gone.
+  const sinceFace = now - lastFaceAt;
+  const seeing = sinceFace < 1000 || (eyesClosed && sinceFace < MAX_CLOSED_MS);
   $("paused").classList.toggle("hidden", !sdk || seeing);
   $("paused").textContent = `Paused: ${lastHint || "looking for a face"}`;
   // Setup hints matter only while there is no face data; once the eyes are tracked, say so.
@@ -313,7 +315,7 @@ $("calibrate").addEventListener("click", startCalibration);
 $("alarm-stop").addEventListener("click", stopAlarm);
 // A USB switch or a caregiver's keyboard works too: Space selects, like a long blink.
 document.addEventListener("keydown", (e) => {
-  if (e.code !== "Space" || !sdk || e.target.tagName === "INPUT") return;
+  if (e.code !== "Space" || !sdk || e.target.closest("input, textarea, select")) return;
   e.preventDefault();
   onSelect(performance.now());
 });
