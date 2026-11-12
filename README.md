@@ -8,7 +8,7 @@ Eye-gaze communication devices often cost more than a family can pay. Hear Me ru
 
 - **Phrase board.** Call for help, yes, no, pain, water, food, toilet, medicine, turn me over, too hot or cold, call the nurse or family, thank you, and more. Each phrase is shown in English and Hindi, and spoken in the language you pick.
 - **Long blink to select.** A natural blink (about 100 to 300 ms) is ignored. A deliberate long blink (0.5 to 5 s) selects. Eyes closed for longer (resting) select nothing. The highlight holds still while the eyes are shut, so the choice is the one they closed their eyes on.
-- **Calibration.** 20 seconds: blink normally, then do three long blinks. Hear Me sets the threshold from that person's own blinks.
+- **Calibration.** 20 seconds: blink normally, then do three long blinks. Hear Me sets the threshold from that person's own blinks, never below 500 ms, so a slow natural blink (looking down) does not select.
 - **Pauses while the person talks.** If they can say a few words, talking never triggers a choice.
 - **Raised eyebrows as a second switch** (optional), for people whose blinks are weak.
 - **Letter board** for anything not on the phrase board, with the most common letters first and word suggestions (type W, A and WATER is one select away).
@@ -49,9 +49,18 @@ Requires Windows x64, macOS (Apple Silicon) or Linux x64, Node.js 20 or newer, a
 git clone <this repo>
 cd hear-me
 npm install
-cp .env.example .env        # then paste your API key from physiology.presagetech.com
 npm start
 ```
+
+On the first start Hear Me asks for your Presage API key (free at physiology.presagetech.com). Paste it and press **Save key**. It is stored only in the app's data folder on this computer. Developers can put `SMARTSPECTRA_API_KEY=...` in a `.env` file instead.
+
+Then, in under a minute:
+
+1. Sit facing the laptop, face well lit, about an arm's length from the camera.
+2. Press **Calibrate** (20 s): blink normally, then do three long blinks.
+3. Close your eyes for about one second while the phrase you want is lit. Hear Me says it aloud. The **Space** bar works as a select too, so you can try the board without blinking.
+
+If the key is wrong or has run out of measurement credits, Hear Me stops the camera and says so, instead of retrying forever.
 
 - Check the camera on its own: `node tools/camera-check.mjs 30` prints which face signals arrive.
 - Record your own face data: `node tools/record-face.mjs out.json 30`.
