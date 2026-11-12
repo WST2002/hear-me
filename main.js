@@ -1,17 +1,14 @@
 // Hear Me main process: one window, the SmartSpectra IPC bridge, camera-only permission for our own page,
-// and the API key read from .env (never bundled into the renderer).
+// and the API key (pasted in the app or read from .env; never bundled into the renderer).
 const fs = require("fs");
 const path = require("path");
 const { pathToFileURL } = require("url");
 const { app, BrowserWindow, ipcMain, session } = require("electron");
 const { bindSmartSpectraIpc } = require("@smartspectra/node-sdk/main");
+const { readApiKey, saveApiKey } = require("./keystore");
 
-function readApiKey() {
-  const file = path.join(__dirname, ".env");
-  if (!fs.existsSync(file)) return "";
-  const line = fs.readFileSync(file, "utf8").split(/\r?\n/).find((l) => l.startsWith("SMARTSPECTRA_API_KEY="));
-  return line ? line.slice(line.indexOf("=") + 1).trim() : "";
-}
+const keyPlaces = () => ({ envFile: path.join(__dirname, ".env"), dataDir: app.getPath("userData") });
+
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -36,7 +33,10 @@ app.whenReady().then(() => {
     const types = details?.mediaTypes || [];
     callback(permission === "media" && types.length === 1 && types[0] === "video" && url.startsWith("file://"));
   });
-  ipcMain.handle("hearme:api-key", () => readApiKey());
+  ipcMain.handle("hearme:api-key", () => readApiKey(keyPlaces()));
+  ipcMain.handle("hearme:save-api-key", (_e, key) => {
+    try { saveApiKey(keyPlaces().dataDir, key); return ""; } catch (e) { return e.message; }
+  });
   // `npm start -- --replay=clip.mp4` feeds a recorded clip instead of the camera (testing and demos).
   const replay = process.argv.find((a) => a.startsWith("--replay="))?.slice(9);
   ipcMain.handle("hearme:replay", () => (replay ? pathToFileURL(path.resolve(replay)).href : null));
