@@ -60,3 +60,7 @@ kbd { border: 1px solid var(--muted); border-radius: 4px; padding: 0 6px; font: 
 #key-box label span { color: var(--muted); font-size: 14px; }
 .key-row { display: flex; gap: 8px; }
 .key-row input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--muted); background: transparent; color: inherit; font: inherit; }
+.said-box { flex: 1; min-width: 0; }
+#said.heard { color: #3ecf8e; }
+#undo-hint { font-size: 18px; color: var(--muted); min-height: 24px; }
+#heard { margin-right: 8px; }

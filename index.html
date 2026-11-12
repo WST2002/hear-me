@@ -22,7 +22,7 @@
       <li><b>Calibrate once (20 s):</b> press <i>Calibrate</i>, blink normally, then do three long blinks.</li>
       <li><b>Close your eyes for about one second</b> while the phrase you want is lit. Hear Me says it aloud.</li>
     </ol>
-    <p class="tip">Trying it as a caregiver or a judge? The <kbd>Space</kbd> bar works as a select too.</p>
+    <p class="tip">Trying it out? The <kbd>Space</kbd> bar works as a select too.</p>
     <div id="key-box" class="hidden">
       <label for="api-key">Presage API key <span>(free at physiology.presagetech.com; saved only on this computer)</span></label>
       <div class="key-row"><input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key"><button id="save-key">Save key</button></div>
@@ -34,7 +34,11 @@
   <section id="app" class="screen hidden">
     <header>
       <h1>Hear Me</h1>
-      <div id="said" aria-live="assertive">Hold a long blink to choose</div>
+      <div class="said-box">
+        <div id="said" aria-live="assertive">Hold a long blink to choose</div>
+        <div id="undo-hint" aria-live="polite"></div>
+      </div>
+      <button id="heard" title="Caregiver: let them know you heard (H)">✓ I heard you</button>
       <button id="stop">Stop camera</button>
     </header>
     <main>

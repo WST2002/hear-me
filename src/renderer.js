@@ -5,6 +5,7 @@ const { createLongBlink, createExpressionHold, createTalkGate } = require("./cor
 const { createScanner } = require("./core/scanner");
 const { createComposer } = require("./core/composer");
 const { createBurst } = require("./core/alarm");
+const { createUndo } = require("./core/undo");
 const { blinkDurations, longBlinkThreshold } = require("./core/calibrate");
 const { eyeOpenness, eyePoints, createEyeClosure } = require("./core/eyes");
 const { phrases, letters } = require("./phrases");
@@ -40,6 +41,9 @@ const gate = createTalkGate();
 // Panic shortcut: four long blinks inside 3 s. Normal use cannot reach that, because of the pause after each phrase.
 const burst = createBurst({ count: 4, withinMs: 3000 });
 const AFTER_PHRASE_MS = 1500;
+// After a phrase the board holds still for a moment; one more long blink takes the phrase back.
+const undo = createUndo({ windowMs: 3000 });
+let lastPhrase = null;
 const composer = createComposer();
 let sdk = null;
 let stream = null;
@@ -99,6 +103,7 @@ function say(text, lang) {
 function speakPhrase({ en, hi }) {
   say(settings.hindi ? hi : en, settings.hindi ? "hi-IN" : "en-IN");
   $("said").textContent = `${en} · ${hi}`;
+  $("said").classList.remove("heard");
 }
 
 // A loud repeating two-tone beep until a caregiver presses "I'm here".
@@ -128,11 +133,21 @@ function stopAlarm() {
 function onSelect(now) {
   live.selects++;
   if (burst.press(now)) {
+    undo.clear();
     startAlarm();
+    return;
+  }
+  const taken = undo.take(now);
+  if (taken) {
+    takeBack(taken);
+    quietUntil = now + AFTER_PHRASE_MS;
+    lastTick = now;
+    drawBoard();
     return;
   }
   if (now < quietUntil) return;
   lastTick = now;
+  const at = scanner.state();
   const value = scanner.select();
   if (value?.action === "alarm") startAlarm();
   else if (value?.action === "letters") switchBoard("letters");
@@ -140,9 +155,29 @@ function onSelect(now) {
     const r = composer.apply(value.key);
     if (r.say) { say(r.say, "en-IN"); $("said").textContent = r.say; }
     switchBoard(r.board ?? "letters");
-  } else if (value) speakPhrase(value);
+  } else if (value) {
+    speakPhrase(value);
+    lastPhrase = value;
+    undo.offer({ phrase: value, row: at.row, cell: at.cell, board: boardName }, now);
+  }
   if (value) quietUntil = now + AFTER_PHRASE_MS;
   drawBoard();
+}
+
+// Take back the last phrase: say so out loud, and put the highlight back on the phrase that was taken back.
+function takeBack({ phrase, row, cell, board: from }) {
+  say(settings.hindi ? "माफ़ कीजिए, ये नहीं।" : "Sorry, not that.", settings.hindi ? "hi-IN" : "en-IN");
+  $("said").textContent = `Taken back: ${phrase.en} · ${phrase.hi}`;
+  lastPhrase = null;
+  if (boardName === from) scanner.goTo(row, cell);
+}
+
+// A caregiver confirms they heard the last phrase, so the person can see their message got through.
+function markHeard() {
+  if (!lastPhrase || alarm) return;
+  $("said").textContent = `✓ Heard: ${lastPhrase.en} · ${lastPhrase.hi}`;
+  $("said").classList.add("heard");
+  lastPhrase = null;
 }
 
 // --- calibration: 10 s of normal blinking, then 10 s of long blinks; sets this person's threshold ---------------
@@ -223,7 +258,9 @@ function scanLoop() {
   $("meter-fill").style.width = `${Math.min(100, (live.openness / 0.45) * 100)}%`;
   $("meter").classList.toggle("closed", seeing && eyesClosed);
   $("meter-text").textContent = !seeing ? "Eyes: no face data" : eyesClosed ? "Eyes: closed" : "Eyes: open";
-  if (sdk && seeing && gateOpen && !calibration && !alarm && !eyesClosed && now - lastTick >= settings.speed) {
+  const undoLeft = undo.secondsLeft(now);
+  $("undo-hint").textContent = undoLeft ? `Wrong one? Long blink again to take it back (${undoLeft})` : "";
+  if (sdk && seeing && gateOpen && !calibration && !alarm && !eyesClosed && !undoLeft && now - lastTick >= settings.speed) {
     scanner.tick();
     lastTick = now;
     drawBoard();
@@ -370,6 +407,7 @@ $("api-key").addEventListener("keydown", (e) => { if (e.key === "Enter") saveKey
 $("stop").addEventListener("click", stop);
 $("calibrate").addEventListener("click", startCalibration);
 $("alarm-stop").addEventListener("click", stopAlarm);
+$("heard").addEventListener("click", markHeard);
 // A USB switch or a caregiver's keyboard works too: Space selects, like a long blink.
 document.addEventListener("keydown", (e) => {
   if (e.code !== "Space" || !sdk || e.target.closest("input, textarea, select")) return;
