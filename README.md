@@ -22,6 +22,25 @@ Eye-gaze communication devices often cost more than a family can pay. Hear Me ru
 
 ## How it uses the Presage SmartSpectra SDK
 
+```mermaid
+flowchart LR
+  cam[Laptop webcam] --> sdk[Presage SmartSpectra SDK]
+  sdk -->|face.landmarks| eyes[Eye openness]
+  eyes --> blink[Long-blink switch]
+  sdk -->|face.talking| gate[Pause while talking]
+  sdk -->|face.expression| brows[Raised-eyebrows switch]
+  sdk -->|validation hints| hints[Setup tips for the caregiver]
+  blink --> board[Scanning board]
+  brows --> board
+  gate --> board
+  board --> speech[Spoken phrase]
+  board --> undo[Undo window]
+  board --> alarm[Call for help alarm]
+  speech --> heard[Caregiver: I heard you]
+```
+
+A **LIVE · Presage SmartSpectra** panel in the app shows the raw values as they arrive (face tracked, eye openness, talking, eyebrows score, frames per second), so a caregiver or a judge can see what Hear Me is reacting to.
+
 Hear Me runs the [SmartSpectra SDK](https://github.com/Presage-Security/SmartSpectra) in Electron, using the camera's face signals:
 
 | Signal | Used for |
@@ -34,6 +53,12 @@ Hear Me runs the [SmartSpectra SDK](https://github.com/Presage-Security/SmartSpe
 The SDK's own `face.blinking` flag marks only the moment of a blink, not how long the eyes stay shut, so Hear Me measures a held blink from the eye landmarks (the eye aspect ratio) against each person's own open-eye level. The face tracker drops landmarks while the eyes are fully shut, so a gap right after the eyes start closing counts as closed. This was tuned and tested on a real recording (`fixtures/eyes-1.json`, eye points only).
 
 The camera stream runs at 640x360 and 30 fps, which keeps the SDK's frame rate on an ordinary laptop CPU. Hear Me picks the built-in camera over virtual cameras.
+
+## Limits
+
+- Tested on one person (the author). It has not been tested with people who have ALS or after a stroke, or with glasses and low light.
+- The alarm is a sound from the laptop: it needs the volume up and is not an emergency call system.
+- It is a communication aid, not a replacement for a clinical AAC assessment or dedicated assistive technology.
 
 ## Camera consent and data handling
 
