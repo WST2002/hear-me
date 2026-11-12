@@ -33,3 +33,12 @@ test("the .env placeholder from .env.example counts as no key", () => {
   fs.writeFileSync(path.join(dir, ".env"), "SMARTSPECTRA_API_KEY=PASTE_YOUR_KEY_HERE\n");
   assert.equal(readApiKey({ envFile: path.join(dir, ".env"), dataDir: tmp() }), "");
 });
+
+test("forgetting the key removes the saved file, and a .env key still works for developers", () => {
+  const { forgetApiKey } = require("../keystore");
+  const data = tmp();
+  saveApiKey(data, "pasted-key");
+  forgetApiKey(data);
+  assert.equal(readApiKey({ envFile: path.join(tmp(), ".env"), dataDir: data }), "");
+  forgetApiKey(data); // nothing saved: no error
+});

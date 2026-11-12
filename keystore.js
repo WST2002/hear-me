@@ -26,4 +26,9 @@ function saveApiKey(dataDir, raw) {
   fs.writeFileSync(path.join(dataDir, FILE), key, { mode: 0o600 });
 }
 
-module.exports = { readApiKey, saveApiKey };
+// Delete the pasted key from this computer (a .env file, if a developer made one, is left alone).
+function forgetApiKey(dataDir) {
+  fs.rmSync(path.join(dataDir, FILE), { force: true });
+}
+
+module.exports = { readApiKey, saveApiKey, forgetApiKey };
