@@ -425,7 +425,9 @@ $("calibrate").addEventListener("click", startCalibration);
 $("alarm-stop").addEventListener("click", stopAlarm);
 $("heard").addEventListener("click", markHeard);
 // A USB switch or a caregiver's keyboard works too: Space selects, like a long blink.
+// H lets a caregiver at the keyboard mark the last phrase as heard.
 document.addEventListener("keydown", (e) => {
+  if (e.code === "KeyH" && sdk && !e.target.closest("input, textarea, select")) { markHeard(); return; }
   if (e.code !== "Space" || !sdk || e.target.closest("input, textarea, select")) return;
   e.preventDefault();
   onSelect(performance.now());
