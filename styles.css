@@ -11,10 +11,10 @@
 body { margin: 0; background: var(--bg); color: var(--text); font: 18px/1.4 "Segoe UI", system-ui, sans-serif; }
 .hidden { display: none !important; }
 .screen { min-height: 100vh; }
-#consent { max-width: 720px; margin: 0 auto; padding: 64px 24px; }
-#consent h1 { font-size: 56px; margin: 0 0 16px; }
+#consent { max-width: 760px; margin: 0 auto; padding: 28px 24px; }
+#consent h1 { font-size: 44px; margin: 0 0 10px; }
 #consent h1 span { display: block; font-size: 22px; color: var(--muted); font-weight: 400; }
-#consent li { margin: 8px 0; color: var(--muted); }
+#consent li { margin: 4px 0; color: var(--muted); }
 button { font: inherit; border: 0; border-radius: 10px; padding: 12px 20px; background: #2b303c; color: var(--text); cursor: pointer; }
 button.primary { background: var(--ok); color: #08130d; font-weight: 600; margin-top: 16px; }
 header { display: flex; align-items: center; gap: 24px; padding: 10px 20px; background: var(--panel); }
@@ -51,11 +51,11 @@ aside { display: flex; flex-direction: column; gap: 12px; }
 label { color: var(--muted); font-size: 15px; }
 #history { margin: 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
 textarea { font: inherit; font-size: 16px; padding: 8px; border-radius: 8px; border: 1px solid #2b303c; background: var(--panel); color: var(--text); }
-#consent h2 { font-size: 20px; margin: 28px 0 8px; }
+#consent h2 { font-size: 20px; margin: 16px 0 6px; }
 #steps li { color: var(--text, #e8e8e8); }
 #consent .tip { color: var(--muted); }
 kbd { border: 1px solid var(--muted); border-radius: 4px; padding: 0 6px; font: inherit; }
-#key-box { margin: 20px 0; }
+#key-box { margin: 12px 0; }
 #key-box label { display: block; margin-bottom: 6px; }
 #key-box label span { color: var(--muted); font-size: 14px; }
 .key-row { display: flex; gap: 8px; }
