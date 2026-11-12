@@ -22,8 +22,8 @@ const percentile = (xs, p) => {
   return s[Math.min(s.length - 1, Math.floor(p * s.length))];
 };
 
-// Halfway between their longer natural blinks and their shorter deliberate ones; never below 350 ms.
-function longBlinkThreshold(natural, deliberate, { floorMs = 350, defaultMs = 500 } = {}) {
+// Halfway between their longer natural blinks and their shorter deliberate ones; never below 500 ms, so a slow natural closure (looking down) never selects.
+function longBlinkThreshold(natural, deliberate, { floorMs = 500, defaultMs = 500 } = {}) {
   if (!deliberate.length) return defaultMs;
   const high = natural.length ? percentile(natural, 0.9) : 0;
   const low = percentile(deliberate, 0.25);

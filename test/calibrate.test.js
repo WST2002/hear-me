@@ -17,8 +17,12 @@ test("the threshold sits between natural and deliberate blinks", () => {
   assert.ok(t > 260 && t < 700, `got ${t}`);
 });
 
-test("the threshold never drops below 350 ms, so natural blinks stay ignored", () => {
-  assert.equal(longBlinkThreshold([100, 120], [300, 320, 340]), 350);
+test("the threshold never drops below 500 ms, so natural blinks stay ignored", () => {
+  assert.equal(longBlinkThreshold([100, 120], [300, 320, 340]), 500);
+});
+
+test("a slow natural closure (looking down, about 450 ms) never selects after calibration", () => {
+  assert.ok(longBlinkThreshold([150, 200, 450], [480, 520, 600]) > 450);
 });
 
 test("with no deliberate blinks it keeps the default", () => {
