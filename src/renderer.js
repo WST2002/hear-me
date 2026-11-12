@@ -55,7 +55,9 @@ let lastFaceAt = 0;
 let eyesClosed = false;
 let lastHint = "";
 // Live readings for the eye meter (and for reading the app state while testing).
-const live = { openness: 0, openLevel: 0, closed: false, faceFrames: 0, selects: 0 };
+const live = { openness: 0, openLevel: 0, closed: false, faceFrames: 0, selects: 0, talking: false, surprise: 0 };
+// Arrival times of landmark frames in the last second, for the live frame rate shown to the caregiver.
+let frameTimes = [];
 window.hearMeLive = live;
 let alarm = null;
 let calibration = null; // { phase, until, frames: { natural: [], deliberate: [] } }
@@ -208,13 +210,18 @@ function calibrationFrame(t, closed) {
 function onMetrics(buf) {
   const face = decodeMetrics(buf).face;
   if (!face) return;
-  for (const s of face.talking ?? []) gateOpen = gate.update(toMs(s.timestamp), Boolean(s.detected));
+  for (const s of face.talking ?? []) {
+    live.talking = Boolean(s.detected);
+    gateOpen = gate.update(toMs(s.timestamp), live.talking);
+  }
+  for (const e of face.expression ?? []) live.surprise = (e.scores ?? []).find((x) => x.type === SURPRISE)?.confidence ?? 0;
   for (const l of face.landmarks ?? []) {
     const t = toMs(l.timestamp);
     const points = l.value ?? [];
     const value = points.length >= 468 ? eyeOpenness(eyePoints(points)) : null;
     if (value !== null) {
       lastFaceAt = performance.now();
+      frameTimes.push(lastFaceAt);
       live.openness = value;
       live.faceFrames++;
     }
@@ -258,6 +265,9 @@ function scanLoop() {
   $("meter-fill").style.width = `${Math.min(100, (live.openness / 0.45) * 100)}%`;
   $("meter").classList.toggle("closed", seeing && eyesClosed);
   $("meter-text").textContent = !seeing ? "Eyes: no face data" : eyesClosed ? "Eyes: closed" : "Eyes: open";
+  frameTimes = frameTimes.filter((x) => now - x < 1000);
+  $("live-values").textContent = !sdk ? "camera off" : !seeing ? "face: not tracked" :
+    `face: tracked · eye openness ${live.openness.toFixed(2)} · talking: ${live.talking ? "yes" : "no"} · eyebrows ${Math.round(live.surprise)}% · ${frameTimes.length} fps`;
   const undoLeft = undo.secondsLeft(now);
   $("undo-hint").textContent = undoLeft ? `Wrong one? Long blink again to take it back (${undoLeft})` : "";
   if (sdk && seeing && gateOpen && !calibration && !alarm && !eyesClosed && !undoLeft && now - lastTick >= settings.speed) {

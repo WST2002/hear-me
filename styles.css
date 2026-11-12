@@ -65,3 +65,5 @@ kbd { border: 1px solid var(--muted); border-radius: 4px; padding: 0 6px; font: 
 #undo-hint { font-size: 18px; color: var(--muted); min-height: 24px; }
 #heard { margin-right: 8px; }
 button.link { background: none; border: none; color: var(--muted); text-decoration: underline; padding: 0; margin-top: 10px; font: inherit; font-size: 14px; cursor: pointer; }
+#live { font: 13px/1.35 Consolas, "Cascadia Mono", monospace; color: var(--muted); background: rgba(255,255,255,0.04); border-radius: 6px; padding: 6px 8px; margin: 4px 0 8px; }
+#live b { color: #3ecf8e; font-weight: 600; margin-right: 4px; }
