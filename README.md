@@ -15,6 +15,8 @@ Eye-gaze communication devices often cost more than a family can pay. Hear Me ru
 - **Your own phrases.** A caregiver types up to five phrases ("Call Mummy", "Switch on the fan") and they appear as a "Mine" row.
 - **Eye meter.** A live bar shows the caregiver whether Hear Me sees the eyes open, closed, or no face at all.
 - **Never scans blind.** If the face is badly placed, the board pauses and says what to fix ("Move up, or tilt the camera down"). If the SDK stops after an error, Hear Me restarts it on its own.
+- **Undo a wrong phrase.** Right after a phrase is spoken, the board holds still for 3 seconds. One more long blink takes it back ("Sorry, not that") and puts the highlight back on that phrase. Switch-scanning devices use the same idea. Call for help is never undone.
+- **"I heard you".** A caregiver presses the button (or H) and the person sees that their message got through.
 - **Call for help.** It is the first item on the board, so it is two selects away. Four quick long blinks also sound the alarm from anywhere. A caregiver stops it with "I'm here".
 - **Space bar or any USB switch** works as a select too, so a caregiver can try the board.
 
@@ -66,6 +68,7 @@ If the key is wrong or has run out of measurement credits, Hear Me stops the cam
 - Record your own face data: `node tools/record-face.mjs out.json 30`.
 - Replay a recorded clip instead of the camera: `npx electron . --replay=clip.mp4` (add `--background` to run without a window, for automated checks).
 - Run the tests: `npm test`.
+- Benchmark the long-blink switch on recorded eye landmarks (no camera or credits needed): `node tools/benchmark.mjs`. It reports natural blinks, false selects and missed long blinks per clip. Only the public recording (`fixtures/eyes-1.json`) ships with the repo; it is one person, so it shows the method, not accuracy across people.
 
 ## Tips
 
