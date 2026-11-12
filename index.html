@@ -16,6 +16,17 @@
       <li>SDK telemetry is turned off. The Presage SDK checks the API key online.</li>
       <li>Hear Me is a communication aid, not a medical device.</li>
     </ul>
+    <h2>How to use it</h2>
+    <ol id="steps">
+      <li><b>Sit facing the laptop</b>, face well lit, about an arm's length from the camera.</li>
+      <li><b>Calibrate once (20 s):</b> press <i>Calibrate</i>, blink normally, then do three long blinks.</li>
+      <li><b>Close your eyes for about one second</b> while the phrase you want is lit. Hear Me says it aloud.</li>
+    </ol>
+    <p class="tip">Trying it as a caregiver or a judge? The <kbd>Space</kbd> bar works as a select too.</p>
+    <div id="key-box" class="hidden">
+      <label for="api-key">Presage API key <span>(free at physiology.presagetech.com; saved only on this computer)</span></label>
+      <div class="key-row"><input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key"><button id="save-key">Save key</button></div>
+    </div>
     <button id="start" class="primary">Turn on the camera and start</button>
     <p id="consent-error"></p>
   </section>

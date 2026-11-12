@@ -51,3 +51,12 @@ aside { display: flex; flex-direction: column; gap: 12px; }
 label { color: var(--muted); font-size: 15px; }
 #history { margin: 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
 textarea { font: inherit; font-size: 16px; padding: 8px; border-radius: 8px; border: 1px solid #2b303c; background: var(--panel); color: var(--text); }
+#consent h2 { font-size: 20px; margin: 28px 0 8px; }
+#steps li { color: var(--text, #e8e8e8); }
+#consent .tip { color: var(--muted); }
+kbd { border: 1px solid var(--muted); border-radius: 4px; padding: 0 6px; font: inherit; }
+#key-box { margin: 20px 0; }
+#key-box label { display: block; margin-bottom: 6px; }
+#key-box label span { color: var(--muted); font-size: 14px; }
+.key-row { display: flex; gap: 8px; }
+.key-row input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--muted); background: transparent; color: inherit; font: inherit; }

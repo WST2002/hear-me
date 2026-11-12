@@ -9,6 +9,7 @@ const { blinkDurations, longBlinkThreshold } = require("./core/calibrate");
 const { eyeOpenness, eyePoints, createEyeClosure } = require("./core/eyes");
 const { phrases, letters } = require("./phrases");
 const { suggest } = require("./core/predict");
+const { errorAdvice } = require("./core/errors");
 
 const SURPRISE = 8; // presage.smartspectra.ExpressionType.SURPRISE
 const $ = (id) => document.getElementById(id);
@@ -251,7 +252,9 @@ async function openCamera() {
 async function start() {
   const apiKey = await window.hearMe.apiKey();
   if (!apiKey) {
-    $("consent-error").textContent = "API key missing: add SMARTSPECTRA_API_KEY to the .env file.";
+    $("key-box").classList.remove("hidden");
+    $("consent-error").textContent = "Paste your Presage API key above and press Save key, then start.";
+    $("api-key").focus();
     return;
   }
   $("consent").classList.add("hidden");
@@ -264,11 +267,18 @@ async function start() {
     lastHint = code === 0 ? "" : hint || "Adjust position";
   });
   sdk.on("metrics", onMetrics);
-  sdk.on("error", (code, message) => {
-    $("hint").textContent = `Camera error ${code}: ${message}`;
+  sdk.on("error", (code, message, retryable) => {
+    const advice = errorAdvice(code, message, retryable);
+    if (!advice.retry) { giveUp(advice); return; }
+    $("hint").textContent = advice.text;
     recover();
   });
-  await sdk.start();
+  try {
+    await sdk.start();
+  } catch (e) {
+    giveUp(errorAdvice(e.code, e.message, e.retryable));
+    return;
+  }
   lastTick = performance.now();
 }
 
@@ -293,10 +303,19 @@ async function recover() {
       await sdk.start();
       break;
     } catch (e) {
+      const advice = errorAdvice(e.code, e.message, e.retryable);
+      if (!advice.retry) { recovering = false; giveUp(advice); return; }
       $("hint").textContent = `Restart failed (try ${attempt}): ${e.message}. Trying again…`;
     }
   }
   recovering = false;
+}
+
+// An error that retrying cannot fix (no credits, wrong key): go back to the start screen and say what to do.
+async function giveUp(advice) {
+  await stop().catch(() => {});
+  $("consent-error").textContent = advice.text;
+  if (advice.askKey) $("key-box").classList.remove("hidden");
 }
 
 async function stop() {
@@ -334,7 +353,20 @@ function bindSettings() {
   });
 }
 
+async function saveKey() {
+  const error = await window.hearMe.saveApiKey($("api-key").value);
+  $("api-key").value = "";
+  if (error) { $("consent-error").textContent = error; return; }
+  $("key-box").classList.add("hidden");
+  $("consent-error").textContent = "Key saved on this computer. Press start.";
+}
+
+// Show the key box up front when no key is set, so nobody has to edit files.
+window.hearMe.apiKey().then((key) => { if (!key) $("key-box").classList.remove("hidden"); });
+
 $("start").addEventListener("click", start);
+$("save-key").addEventListener("click", saveKey);
+$("api-key").addEventListener("keydown", (e) => { if (e.key === "Enter") saveKey(); });
 $("stop").addEventListener("click", stop);
 $("calibrate").addEventListener("click", startCalibration);
 $("alarm-stop").addEventListener("click", stopAlarm);
