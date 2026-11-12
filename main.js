@@ -5,7 +5,7 @@ const path = require("path");
 const { pathToFileURL } = require("url");
 const { app, BrowserWindow, ipcMain, session } = require("electron");
 const { bindSmartSpectraIpc } = require("@smartspectra/node-sdk/main");
-const { readApiKey, saveApiKey } = require("./keystore");
+const { readApiKey, saveApiKey, forgetApiKey } = require("./keystore");
 
 const keyPlaces = () => ({ envFile: path.join(__dirname, ".env"), dataDir: app.getPath("userData") });
 
@@ -34,6 +34,7 @@ app.whenReady().then(() => {
     callback(permission === "media" && types.length === 1 && types[0] === "video" && url.startsWith("file://"));
   });
   ipcMain.handle("hearme:api-key", () => readApiKey(keyPlaces()));
+  ipcMain.handle("hearme:forget", () => forgetApiKey(keyPlaces().dataDir));
   ipcMain.handle("hearme:save-api-key", (_e, key) => {
     try { saveApiKey(keyPlaces().dataDir, key); return ""; } catch (e) { return e.message; }
   });

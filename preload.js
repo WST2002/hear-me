@@ -5,5 +5,6 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("hearMe", {
   apiKey: () => ipcRenderer.invoke("hearme:api-key"),
   saveApiKey: (key) => ipcRenderer.invoke("hearme:save-api-key", key),
+  forget: () => ipcRenderer.invoke("hearme:forget"),
   replay: () => ipcRenderer.invoke("hearme:replay"),
 });

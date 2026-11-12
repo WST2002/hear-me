@@ -403,6 +403,22 @@ window.hearMe.apiKey().then((key) => { if (!key) $("key-box").classList.remove("
 
 $("start").addEventListener("click", start);
 $("save-key").addEventListener("click", saveKey);
+
+// Two clicks, so nothing is deleted by accident: removes the pasted key and every saved setting and phrase.
+let forgetArmed = false;
+$("forget").addEventListener("click", async () => {
+  if (!forgetArmed) {
+    forgetArmed = true;
+    $("forget").textContent = "Click again to delete the key, settings and your own phrases";
+    return;
+  }
+  forgetArmed = false;
+  await window.hearMe.forget();
+  try { localStorage.removeItem("hearme.settings"); } catch {}
+  $("forget").textContent = "Delete my saved key and settings from this computer";
+  $("consent-error").textContent = "Deleted: your API key, settings and own phrases are gone from this computer. Restart the app to begin fresh.";
+  $("key-box").classList.remove("hidden");
+});
 $("api-key").addEventListener("keydown", (e) => { if (e.key === "Enter") saveKey(); });
 $("stop").addEventListener("click", stop);
 $("calibrate").addEventListener("click", startCalibration);
