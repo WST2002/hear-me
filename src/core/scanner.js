@@ -9,6 +9,12 @@ function createScanner(grid) {
 
   return {
     state: () => ({ mode, row, cell }),
+    // Jump straight to a cell (used after an undo, so the person is back on the item they took back).
+    goTo(r, c) {
+      mode = "cells";
+      row = r;
+      cell = c;
+    },
     tick() {
       if (mode === "rows") {
         row = (row + 1) % grid.length;
