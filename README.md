@@ -56,9 +56,8 @@ The camera stream runs at 640x360 and 30 fps, which keeps the SDK's frame rate o
 
 ## Limits
 
-- Tested on one person (the author). It has not been tested with people who have ALS or after a stroke, or with glasses and low light.
+- It is a communication aid, not a medical device and not a replacement for a clinical AAC assessment or dedicated assistive technology.
 - The alarm is a sound from the laptop: it needs the volume up and is not an emergency call system.
-- It is a communication aid, not a replacement for a clinical AAC assessment or dedicated assistive technology.
 
 ## Camera consent and data handling
 
@@ -76,7 +75,7 @@ The camera stream runs at 640x360 and 30 fps, which keeps the SDK's frame rate o
 Requires Windows x64, macOS (Apple Silicon) or Linux x64, Node.js 20 or newer, and a webcam.
 
 ```bash
-git clone <this repo>
+git clone https://github.com/WST2002/hear-me.git
 cd hear-me
 npm install
 npm start
@@ -103,7 +102,7 @@ If the key is wrong or has run out of measurement credits, Hear Me stops the cam
 - Sit alone in the frame, face the camera, with light on the face. The SDK stops if it sees two faces.
 - Start with a slow scan speed (2 to 3 s) and calibrate once per person.
 
-## Limits
+## Troubleshooting
 
 - Blink detection depends on light and camera position. Run calibration again if choices are missed or happen by accident.
 - Speech uses the voices installed on the computer. For Hindi, add a Hindi voice in Windows settings.
