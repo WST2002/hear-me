@@ -39,7 +39,7 @@ const closure = createEyeClosure();
 const brows = createExpressionHold({ holdMs: 400 });
 const gate = createTalkGate();
 // Panic shortcut: four long blinks inside 3 s. Normal use cannot reach that, because of the pause after each phrase.
-const burst = createBurst({ count: 4, withinMs: 3000 });
+const burst = createBurst({ count: 4, withinMs: 5000 }); // a long blink takes at least 0.5 s, so four need a few seconds
 const AFTER_PHRASE_MS = 1500;
 // After a phrase the board holds still for a moment; one more long blink takes the phrase back.
 const undo = createUndo({ windowMs: 3000 });

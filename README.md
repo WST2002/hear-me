@@ -2,7 +2,7 @@
 
 Hear Me is a free desktop app for people who cannot speak or use their hands, after a stroke or with ALS, for example. It needs only a laptop webcam. A highlight steps through a board of everyday phrases. The person holds a long blink to choose one, and Hear Me speaks it aloud in English or Hindi.
 
-Eye-gaze communication devices often cost more than a family can pay. Hear Me runs on a laptop the family already has.
+Dedicated eye-gaze communication systems can cost thousands of dollars. Hear Me needs only a laptop with a webcam.
 
 ## What it does
 
@@ -17,7 +17,7 @@ Eye-gaze communication devices often cost more than a family can pay. Hear Me ru
 - **Never scans blind.** If the face is badly placed, the board pauses and says what to fix ("Move up, or tilt the camera down"). If the SDK stops after an error, Hear Me restarts it on its own.
 - **Undo a wrong phrase.** Right after a phrase is spoken, the board holds still for 3 seconds. One more long blink takes it back ("Sorry, not that") and puts the highlight back on that phrase. Switch-scanning devices use the same idea. Call for help is never undone.
 - **"I heard you".** A caregiver presses the button (or H) and the person sees that their message got through.
-- **Call for help.** It is the first item on the board, so it is two selects away. Four quick long blinks also sound the alarm from anywhere. A caregiver stops it with "I'm here".
+- **Call for help.** It is the first item on the board, so it is two selects away. Four long blinks within 5 seconds also sound the alarm from anywhere. A caregiver stops it with "I'm here".
 - **Space bar or any USB switch** works as a select too, so a caregiver can try the board.
 
 ## How it uses the Presage SmartSpectra SDK
@@ -39,7 +39,7 @@ flowchart LR
   speech --> heard[Caregiver: I heard you]
 ```
 
-A **LIVE · Presage SmartSpectra** panel in the app shows the raw values as they arrive (face tracked, eye openness, talking, eyebrows score, frames per second), so a caregiver or a judge can see what Hear Me is reacting to.
+A **LIVE · Presage SmartSpectra** panel in the app shows the live SDK signals as they arrive (face tracked, talking, and the surprise-expression score shown as "eyebrows %") next to the values Hear Me derives from them (eye openness from the face landmarks, frames per second), so a caregiver or a judge can see what Hear Me is reacting to.
 
 Hear Me runs the [SmartSpectra SDK](https://github.com/Presage-Security/SmartSpectra) in Electron, using the camera's face signals:
 
@@ -52,7 +52,7 @@ Hear Me runs the [SmartSpectra SDK](https://github.com/Presage-Security/SmartSpe
 
 The SDK's own `face.blinking` flag marks only the moment of a blink, not how long the eyes stay shut, so Hear Me measures a held blink from the eye landmarks (the eye aspect ratio) against each person's own open-eye level. The face tracker drops landmarks while the eyes are fully shut, so a gap right after the eyes start closing counts as closed. This was tuned and tested on a real recording (`fixtures/eyes-1.json`, eye points only).
 
-The camera stream runs at 640x360 and 30 fps, which keeps the SDK's frame rate on an ordinary laptop CPU. Hear Me picks the built-in camera over virtual cameras.
+The camera stream runs at 640x360 and 30 fps, which kept the SDK at about 30 fps on my test laptop. Hear Me picks the built-in camera over virtual cameras.
 
 ## Limits
 
@@ -61,14 +61,20 @@ The camera stream runs at 640x360 and 30 fps, which keeps the SDK's frame rate o
 
 ## Camera consent and data handling
 
-- **Consent.** The camera turns on only after the caregiver or user presses **Turn on the camera and start**, and turns off with **Stop camera**. Hear Me asks for the camera only (no microphone), and only for its own window.
+- **Consent.** The camera turns on only after the caregiver or user presses **Turn on the camera and start**, and turns off with **Stop camera**. Hear Me asks for the camera only (no microphone), and only for its own window. Use Hear Me only with the agreement of the person in front of the camera (or, if they cannot communicate it, their authorised representative), never covertly.
 - **Processing.** The SmartSpectra SDK processes the video on this computer. Presage's SDK documentation says vitals are computed on-device and its telemetry sends no raw video. Hear Me does not record, upload or save any video, image or measurement.
 - **Network.** The SDK contacts Presage's server to check the API key and count measurement credits. SDK telemetry is turned off (`enableTelemetry: false`). Hear Me itself sends nothing anywhere: no analytics, no AI service.
 - **Speech.** Phrases are spoken with the voices installed on the computer. The list of phrases said in a session is shown on screen and is not saved.
 - **What is stored, and for how long.** Only two things, both on this computer, kept until you delete them: the API key you paste (a file in the app's data folder) and the settings (scan speed, language, blink threshold, raised-eyebrows switch, privacy view, the caregiver's own phrases) in the app's local storage.
 - **Deletion.** On the start screen, **Delete my saved key and settings from this computer** removes the key, the settings and the own phrases (two clicks, so it can't happen by accident). Uninstalling the app and its data folder removes everything too.
-- **Sharing.** Nothing is shared with anyone.
+- **Sharing.** Hear Me shares no camera images, measurements or phrases with anyone. The SDK itself contacts Presage only to validate the key and count credits.
 - Hear Me is a communication aid. It does not diagnose, treat or monitor any condition, and it is not a replacement for a clinical AAC assessment or an emergency call system.
+
+## Verify the Presage integration
+
+- SDK: `@smartspectra/node-sdk`, created in [src/renderer.js](src/renderer.js#L309) with `enableTelemetry: false` and the face metrics requested.
+- Live signals used, all in [src/renderer.js](src/renderer.js#L213-L239): `face.talking` pauses the board while the person talks, `face.expression` (the surprise score) is the second switch and is shown live as "eyebrows %", and `face.landmarks` give the eye openness for the long-blink switch.
+- See them live: start the camera and watch the **LIVE · Presage SmartSpectra** panel, or run `node tools/camera-check.mjs 30` to print each face signal as it arrives.
 
 ## Setup
 
