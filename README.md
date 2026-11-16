@@ -1,6 +1,6 @@
 # Hear Me: a blink becomes a voice
 
-Hear Me is a free desktop app for people who cannot speak or use their hands, after a stroke or with ALS, for example. It needs only a laptop webcam. A highlight steps through a board of everyday phrases. The person holds a long blink to choose one, and Hear Me speaks it aloud in English or Hindi.
+Hear Me is an open-source desktop app for people who cannot speak or use their hands, after a stroke or with ALS, for example. It needs only a laptop webcam. A highlight steps through a board of everyday phrases. The person holds a long blink to choose one, and Hear Me speaks it aloud in English or Hindi.
 
 Dedicated eye-gaze communication systems can cost thousands of dollars. Hear Me needs only a laptop with a webcam.
 
