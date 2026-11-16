@@ -4,6 +4,14 @@ Hear Me is a free desktop app for people who cannot speak or use their hands, af
 
 Dedicated eye-gaze communication systems can cost thousands of dollars. Hear Me needs only a laptop with a webcam.
 
+## Demo
+
+[![Hear Me demo video](https://img.youtube.com/vi/5SaOmy57_e0/hqdefault.jpg)](https://youtu.be/5SaOmy57_e0)
+
+Watch the demo: https://youtu.be/5SaOmy57_e0
+
+Demo face: Pexels stock video 8226089, played into the app through the Presage SDK.
+
 ## What it does
 
 - **Phrase board.** Call for help, yes, no, pain, water, food, toilet, medicine, turn me over, too hot or cold, call the nurse or family, thank you, and more. Each phrase is shown in English and Hindi, and spoken in the language you pick.
