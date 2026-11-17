@@ -1,8 +1,16 @@
 # Hear Me: a blink becomes a voice
 
-Hear Me is a free desktop app for people who cannot speak or use their hands, after a stroke or with ALS, for example. It needs only a laptop webcam. A highlight steps through a board of everyday phrases. The person holds a long blink to choose one, and Hear Me speaks it aloud in English or Hindi.
+Hear Me is an open-source desktop app for people who cannot speak or use their hands, after a stroke or with ALS, for example. It needs only a laptop webcam. A highlight steps through a board of everyday phrases. The person holds a long blink to choose one, and Hear Me speaks it aloud in English or Hindi.
 
 Dedicated eye-gaze communication systems can cost thousands of dollars. Hear Me needs only a laptop with a webcam.
+
+## Demo
+
+[![Hear Me demo video](https://img.youtube.com/vi/5SaOmy57_e0/hqdefault.jpg)](https://youtu.be/5SaOmy57_e0)
+
+Watch the demo: https://youtu.be/5SaOmy57_e0
+
+Demo face: Pexels stock video 8226089, played into the app through the Presage SDK.
 
 ## What it does
 
@@ -101,7 +109,7 @@ If the key is wrong or has run out of measurement credits, Hear Me stops the cam
 - Record your own face data: `node tools/record-face.mjs out.json 30`.
 - Replay a recorded clip instead of the camera: `npx electron . --replay=clip.mp4` (add `--background` to run without a window, for automated checks).
 - Run the tests: `npm test`.
-- Benchmark the long-blink switch on recorded eye landmarks (no camera or credits needed): `node tools/benchmark.mjs`. It reports natural blinks, false selects and missed long blinks per clip. Only the public recording (`fixtures/eyes-1.json`) ships with the repo; it is one person, so it shows the method, not accuracy across people.
+- Benchmark the long-blink switch on recorded eye landmarks (no camera or credits needed): `node tools/benchmark.mjs`. It reports natural blinks, false selects and missed long blinks per clip. The repo ships one recording (`fixtures/eyes-1.json`); run it on your own recordings too.
 
 ## Tips
 
