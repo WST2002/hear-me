@@ -109,7 +109,7 @@ If the key is wrong or has run out of measurement credits, Hear Me stops the cam
 - Record your own face data: `node tools/record-face.mjs out.json 30`.
 - Replay a recorded clip instead of the camera: `npx electron . --replay=clip.mp4` (add `--background` to run without a window, for automated checks).
 - Run the tests: `npm test`.
-- Benchmark the long-blink switch on recorded eye landmarks (no camera or credits needed): `node tools/benchmark.mjs`. It reports natural blinks, false selects and missed long blinks per clip. Only the public recording (`fixtures/eyes-1.json`) ships with the repo; it is one person, so it shows the method, not accuracy across people.
+- Benchmark the long-blink switch on recorded eye landmarks (no camera or credits needed): `node tools/benchmark.mjs`. It reports natural blinks, false selects and missed long blinks per clip. The repo ships one recording (`fixtures/eyes-1.json`); run it on your own recordings too.
 
 ## Tips
 
